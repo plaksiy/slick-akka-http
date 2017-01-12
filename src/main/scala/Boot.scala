@@ -4,6 +4,9 @@ import akka.stream.ActorMaterializer
 import rest.SupplierRoutes
 import utils._
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
 object Main extends App with RouteConcatenation with CorsSupport{
   // configuring modules for application, cake pattern for DI
   val modules = new ConfigurationModuleImpl  with ActorModuleImpl with PersistenceModuleImpl
@@ -11,7 +14,9 @@ object Main extends App with RouteConcatenation with CorsSupport{
   implicit val materializer = ActorMaterializer()
   implicit val ec = modules.system.dispatcher
 
-  modules.suppliersDal.createTable()
+  import modules.profile.api._
+  Await.result(modules.db.run(modules.suppliersDal.tableQuery.schema.create), Duration.Inf)
+
 
   val swaggerService = new SwaggerDocService(system)
 

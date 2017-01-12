@@ -5,17 +5,17 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.{Directives, Route}
 import entities.JsonProtocol
 import persistence.entities.{SimpleSupplier, Supplier}
-import utils.{Configuration, PersistenceModule}
+import utils.{Configuration, DbModule, PersistenceModule}
 import JsonProtocol._
 import SprayJsonSupport._
 import scala.util.{Failure, Success}
 import io.swagger.annotations._
 import javax.ws.rs.Path
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Path("/supplier")
 @Api(value = "/supplier", produces = "application/json")
-class SupplierRoutes(modules: Configuration with PersistenceModule)  extends Directives {
-
+class SupplierRoutes(modules: Configuration with PersistenceModule with DbModule)  extends Directives {
   @Path("/{id}")
   @ApiOperation(value = "Return Supplier", notes = "", nickname = "", httpMethod = "GET")
   @ApiImplicitParams(Array(
@@ -30,7 +30,8 @@ class SupplierRoutes(modules: Configuration with PersistenceModule)  extends Dir
   def supplierGetRoute = path("supplier" / IntNumber) { (supId) =>
     get {
       validate(supId > 0,"The supplier id should be greater than zero") {
-        onComplete((modules.suppliersDal.findById(supId)).mapTo[Option[Supplier]]) {
+        val dbAction = modules.suppliersDal.searchOne(supId)
+        onComplete(modules.db.run(dbAction)) {
           case Success(supplierOpt) => supplierOpt match {
             case Some(sup) => complete(sup)
             case None => complete(NotFound, s"The supplier doesn't exist")
@@ -53,9 +54,10 @@ class SupplierRoutes(modules: Configuration with PersistenceModule)  extends Dir
   ))
  def supplierPostRoute = path("supplier") {
     post {
-      entity(as[SimpleSupplier]) { supplierToInsert => onComplete((modules.suppliersDal.insert(Supplier(0, supplierToInsert.name, supplierToInsert.desc)))) {
-        // ignoring the number of insertedEntities because in this case it should always be one, you might check this in other cases
-        case Success(insertedEntities) => complete(Created)
+      entity(as[SimpleSupplier]) { supplierToInsert =>
+        val dbAction: modules.suppliersDal.driver.api.DBIO[Supplier] = modules.suppliersDal.save(Supplier(None, supplierToInsert.name, supplierToInsert.desc))
+        onComplete(modules.db.run(dbAction)) {
+        case Success(_) => complete(Created)
         case Failure(ex) => complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
       }
       }

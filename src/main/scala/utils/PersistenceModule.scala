@@ -1,11 +1,9 @@
 package utils
 
-import akka.actor.{ActorPath, ActorSelection, Props, ActorRef}
-import persistence.dal._
+import com.byteslounge.slickrepo.repository.Repository
 import slick.backend.DatabaseConfig
-import slick.driver.{JdbcProfile}
-import persistence.entities.{SuppliersTable, Supplier}
-import slick.lifted.TableQuery
+import slick.driver.JdbcProfile
+import persistence.entities.{Supplier, SupplierRepository}
 
 
 trait Profile {
@@ -18,7 +16,7 @@ trait DbModule extends Profile{
 }
 
 trait PersistenceModule {
-	val suppliersDal: BaseDal[SuppliersTable,Supplier]
+	val suppliersDal: Repository[Supplier, Int]
 }
 
 
@@ -32,6 +30,6 @@ trait PersistenceModuleImpl extends PersistenceModule with DbModule{
 	override implicit val profile: JdbcProfile = dbConfig.driver
 	override implicit val db: JdbcProfile#Backend#Database = dbConfig.db
 
-	override val suppliersDal = new BaseDalImpl[SuppliersTable,Supplier](TableQuery[SuppliersTable]) {}
+	override val suppliersDal = new SupplierRepository(profile)
 
 }
