@@ -4,13 +4,10 @@ The Slick Akka Http is a very simple json rest api showing one way of using akka
 
 It supports the following features:
 
-* Generic Data Access layer, create a DAL with crud for an entity with just one line
-* Models as case classes and slick models, independent from database driver and profile
-* Multiple database types configured in properties file (h2 and postgresql for instance)
+* Generic Data Access layer, using [slick-repo](https://github.com/gonmarques/slick-repo)
 * Cake pattern for DI
 * Spray-json to parse json
-* Tests for DAL
-* tests for routes
+* Tests for routes
 
 Utils: 
 
@@ -29,17 +26,23 @@ The database pre-configured is an h2, so you just have to:
 
 #Testing
 
-To run all tests (routes and persistence tests):
+To run all tests:
 
 
         $ sbt test
 
 #Using
 
+With curl:
+
 	curl --request POST localhost:8080/supplier -H "Content-type: application/json" --data "{\"name\" : \"sup1\",\"desc\" : \"low prices\"}"
 
 	curl localhost:8080/supplier/1
+		
+You can also use swagger:
+
+    http://localhost:8080/swagger/index.html
 
 #Credits
 
-To make this template, I just mixed the tutorials and templates, so credits for akka and slick guys, and swagger-akka-http.
+To make this template, I just mixed tutorials and templates, so credits for akka and slick guys, swagger-akka-http and slick-repo owners.

@@ -12,13 +12,9 @@
 
     <p> It supports the following features:    </p>
 
-    <ul><li>   Generic Data Access layer, create a DAL with crud for an entity with just one line    </li>
-        <li>   Models as case classes and slick models, independent from database driver and profile    </li>
-        <li>   Multiple database types configured in properties file (h2 and postgresql for instance)    </li>
+    <ul><li>   Generic Data Access layer, using slick-repo to create generic repositories</li>
         <li>   Cake pattern for DI    </li>
         <li>   Spray-json to parse json    </li>
-        <li>   Cake pattern for DI    </li>
-        <li>   Tests for DALs    </li>
         <li>   Tests for routes   </li></ul>
     <p>   Utils:    Typesafe config for property management  and Typesafe Scala Logging (LazyLogging)    </p>
 </div>
@@ -50,33 +46,7 @@
 
 <div>
     <h2>Slick 3</h2>
-    <p>Models as case classes and slick 3 schemas extending from a BaseEntity and BaseTable </p>
-
-    <pre><code> case class Supplier(name: String,desc: String)  extends BaseEntity </code></pre>
-
-
-    <pre><code>class SuppliersTable(tag: Tag) extends BaseTable[Supplier](tag, "SUPPLIERS") {
-  def name = column[String]("userID")
-  def desc = column[String]("last_name")
-  def * = (id, name, desc) <> (Supplier.tupled, Supplier.unapply)
-}</code></pre>
-
-
-    <p>BaseEntity and BaseTable provide Id for the class and table.</p>
-
-    
-    <p>The model definition is database independent. The database type is declared in application.conf, for each database. For instance, we use an h2 database in this example with the follow configuration:</p>
-    <pre><code>
-        h2db {
-          driver = "slick.driver.H2Driver$"
-          db {
-            url = "jdbc:h2:mem:test1"
-            driver = org.h2.Driver
-            keepAliveConnection = true
-            numThreads = 10
-          }
-        }
-    </code></pre>
+    <p>Models as case classes using slick-repo to have generic repos</p>
 </div>
 
 <div>
@@ -86,17 +56,6 @@
 
     <pre><code>
         class RoutesActor(modules: Configuration with PersistenceModule)
-    </code></pre>
-
-</div>
-
-<div>
-    <h2>Generic DAL</h2>
-    <p>This seed has a generic slick dal that can be used to implement a crud for an entity.</p>
-    <p>The generic DAL is used in suppliers DAL as example:</p>
-
-    <pre><code>
-        	override val suppliersDal = new BaseDalImpl[SuppliersTable,Supplier](TableQuery[SuppliersTable]) {}
     </code></pre>
 
 </div>
