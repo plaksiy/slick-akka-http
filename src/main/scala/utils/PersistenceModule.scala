@@ -4,6 +4,9 @@ import com.byteslounge.slickrepo.repository.Repository
 import slick.backend.DatabaseConfig
 import slick.driver.JdbcProfile
 import persistence.entities.{Supplier, SupplierRepository}
+import slick.dbio.DBIO
+
+import scala.concurrent.Future
 
 
 trait Profile {
@@ -13,6 +16,11 @@ trait Profile {
 
 trait DbModule extends Profile{
 	val db: JdbcProfile#Backend#Database
+
+	implicit def executeOperation[T](databaseOperation: DBIO[T]): Future[T] = {
+		db.run(databaseOperation)
+	}
+
 }
 
 trait PersistenceModule {

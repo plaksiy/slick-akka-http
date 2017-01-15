@@ -16,6 +16,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 @Path("/supplier")
 @Api(value = "/supplier", produces = "application/json")
 class SupplierRoutes(modules: Configuration with PersistenceModule with DbModule)  extends Directives {
+  import modules.executeOperation
+
   @Path("/{id}")
   @ApiOperation(value = "Return Supplier", notes = "", nickname = "", httpMethod = "GET")
   @ApiImplicitParams(Array(
@@ -30,8 +32,8 @@ class SupplierRoutes(modules: Configuration with PersistenceModule with DbModule
   def supplierGetRoute = path("supplier" / IntNumber) { (supId) =>
     get {
       validate(supId > 0,"The supplier id should be greater than zero") {
-        val dbAction = modules.suppliersDal.searchOne(supId)
-        onComplete(modules.db.run(dbAction)) {
+
+        onComplete(modules.suppliersDal.searchOne(supId)) {
           case Success(supplierOpt) => supplierOpt match {
             case Some(sup) => complete(sup)
             case None => complete(NotFound, s"The supplier doesn't exist")
@@ -55,8 +57,7 @@ class SupplierRoutes(modules: Configuration with PersistenceModule with DbModule
  def supplierPostRoute = path("supplier") {
     post {
       entity(as[SimpleSupplier]) { supplierToInsert =>
-        val dbAction: modules.suppliersDal.driver.api.DBIO[Supplier] = modules.suppliersDal.save(Supplier(None, supplierToInsert.name, supplierToInsert.desc))
-        onComplete(modules.db.run(dbAction)) {
+        onComplete(modules.suppliersDal.save(Supplier(None, supplierToInsert.name, supplierToInsert.desc))) {
         case Success(_) => complete(Created)
         case Failure(ex) => complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
       }
