@@ -15,7 +15,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %%  "akka-http-testkit" % akkaV,
     "com.typesafe.akka"	  %%  "akka-http-spray-json-experimental"	% akkaV,
     "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
-    "com.byteslounge" %% "slick-repo" % "1.1.1",
+    "com.byteslounge" %% "slick-repo" % "1.2.2",
     "com.github.swagger-akka-http" %% "swagger-akka-http" % "0.6.2",
     "com.typesafe.akka"   %%  "akka-testkit"  % akkaV   % "test",
     "org.specs2"          %%  "specs2-core"   % "2.3.11" % "test",

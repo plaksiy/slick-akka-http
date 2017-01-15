@@ -23,7 +23,7 @@ class RoutesSpec extends AbstractRestTest {
 
     "return an empty array of suppliers" in {
       val dbAction: modules.suppliersDal.driver.api.DBIO[Option[Supplier]] = DBIOAction.from(Future(None))
-      modules.suppliersDal.searchOne(1) returns dbAction
+      modules.suppliersDal.findOne(1) returns dbAction
       Get("/supplier/1") ~> suppliers.routes ~> check {
         handled shouldEqual true
         status shouldEqual NotFound
@@ -32,7 +32,7 @@ class RoutesSpec extends AbstractRestTest {
 
     "return an empty array of suppliers when ask for supplier Bad Request when the supplier is < 1" in {
       val dbAction: modules.suppliersDal.driver.api.DBIO[Option[Supplier]] = DBIOAction.from(Future(None))
-      modules.suppliersDal.searchOne(1) returns dbAction
+      modules.suppliersDal.findOne(1) returns dbAction
       Get("/supplier/0") ~> suppliers.routes ~> check {
         handled shouldEqual false
         rejection shouldEqual ValidationRejection("The supplier id should be greater than zero", None)
@@ -42,7 +42,7 @@ class RoutesSpec extends AbstractRestTest {
 
     "return an array with 1 suppliers" in {
       val dbAction: modules.suppliersDal.driver.api.DBIO[Option[Supplier]] = DBIOAction.from(Future(Some(Supplier(Some(1), "name", "desc"))))
-      modules.suppliersDal.searchOne(1) returns dbAction
+      modules.suppliersDal.findOne(1) returns dbAction
       Get("/supplier/1") ~> suppliers.routes ~> check {
         handled shouldEqual true
         status shouldEqual OK

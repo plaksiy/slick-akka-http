@@ -33,7 +33,7 @@ class SupplierRoutes(modules: Configuration with PersistenceModule with DbModule
     get {
       validate(supId > 0,"The supplier id should be greater than zero") {
 
-        onComplete(modules.suppliersDal.searchOne(supId)) {
+        onComplete(modules.suppliersDal.findOne(supId)) {
           case Success(supplierOpt) => supplierOpt match {
             case Some(sup) => complete(sup)
             case None => complete(NotFound, s"The supplier doesn't exist")
