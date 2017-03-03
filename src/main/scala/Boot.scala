@@ -1,7 +1,7 @@
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.RouteConcatenation
 import akka.stream.ActorMaterializer
-import rest.SupplierRoutes
+import rest.{AuthorRoutes, BookRoutes, SupplierRoutes}
 import utils._
 
 import scala.concurrent.Await
@@ -16,11 +16,15 @@ object Main extends App with RouteConcatenation with CorsSupport{
 
   import modules.profile.api._
   Await.result(modules.db.run(modules.suppliersDal.tableQuery.schema.create), Duration.Inf)
+  Await.result(modules.db.run(modules.authorsDal.tableQuery.schema.create), Duration.Inf)
+  Await.result(modules.db.run(modules.booksDal.tableQuery.schema.create), Duration.Inf)
 
 
   val swaggerService = new SwaggerDocService(system)
 
   val bindingFuture = Http().bindAndHandle(
+    new AuthorRoutes(modules).routes ~
+    new BookRoutes(modules).routes ~
     new SupplierRoutes(modules).routes ~
     swaggerService.assets ~
     corsHandler(swaggerService.routes), "localhost", 8080)

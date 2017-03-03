@@ -6,12 +6,12 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.stream.ActorMaterializer
 import com.github.swagger.akka._
 import com.github.swagger.akka.model.Info
-import rest.SupplierRoutes
+import rest._
 
 class SwaggerDocService(system: ActorSystem) extends SwaggerHttpService with HasActorSystem {
   override implicit val actorSystem: ActorSystem = system
   override implicit val materializer: ActorMaterializer = ActorMaterializer()
-  override val apiTypes = Seq(ru.typeOf[SupplierRoutes])
+  override val apiTypes = Seq(ru.typeOf[SupplierRoutes], ru.typeOf[AuthorRoutes], ru.typeOf[BookRoutes])
   override val host = "localhost:8080"
   override val info = Info(version = "2.0")
 

@@ -2,7 +2,7 @@ package rest
 
 import org.scalatest.{Matchers, WordSpec}
 import org.specs2.mock.Mockito
-import persistence.entities.{Supplier, SupplierRepository}
+import persistence.entities.{Author, Book, Supplier, SupplierRepository}
 import utils.{ActorModule, ConfigurationModuleImpl, DbModule, PersistenceModule}
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
@@ -20,6 +20,8 @@ trait AbstractRestTest  extends WordSpec with Matchers with ScalatestRouteTest w
     override implicit val profile: JdbcProfile = dbConfig.driver
     override implicit val db: JdbcProfile#Backend#Database = dbConfig.db
     override val suppliersDal = mock[Repository[Supplier, Int]]
+    override val authorsDal = mock[Repository[Author, Int]]
+    override val booksDal = mock[Repository[Book, Int]]
   }
 
   def getConfig: Config = ConfigFactory.empty();
