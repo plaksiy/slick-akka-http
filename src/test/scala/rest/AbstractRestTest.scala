@@ -1,8 +1,10 @@
 package rest
 
+import persistence.entities.BookRepository.Book
+
 import org.scalatest.{Matchers, WordSpec}
 import org.specs2.mock.Mockito
-import persistence.entities.{Author, Book, Supplier, SupplierRepository}
+import persistence.entities.{Author, Supplier, SupplierRepository}
 import utils.{ActorModule, ConfigurationModuleImpl, DbModule, PersistenceModule}
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
@@ -10,6 +12,7 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.byteslounge.slickrepo.repository.Repository
 import slick.backend.DatabaseConfig
 import slick.driver.JdbcProfile
+
 
 trait AbstractRestTest  extends WordSpec with Matchers with ScalatestRouteTest with Mockito{
 
@@ -20,8 +23,8 @@ trait AbstractRestTest  extends WordSpec with Matchers with ScalatestRouteTest w
     override implicit val profile: JdbcProfile = dbConfig.driver
     override implicit val db: JdbcProfile#Backend#Database = dbConfig.db
     override val suppliersDal = mock[Repository[Supplier, Int]]
-    override val authorsDal = mock[Repository[Author, Int]]
-    override val booksDal = mock[Repository[Book, Int]]
+    override val authorsDal = mock[Repository[Author, Long]]
+    override val booksDal = mock[Repository[Book, Long]]
   }
 
   def getConfig: Config = ConfigFactory.empty();

@@ -1,9 +1,5 @@
 package rest
 
-import persistence.entities.{Author, Book}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-
 
 class AuthorDBSpec extends DBTest {
   import rest.TestData._
@@ -11,19 +7,59 @@ class AuthorDBSpec extends DBTest {
   "Author Repository" should {
 
     "return an empty array of authors" in {
-      val authors = getAllAuthors()
+      val authors = getAllAuthors
       authors.isEmpty shouldEqual true
+      authorsCount shouldEqual 0
     }
 
     "create an author" in {
-      addAuthor(trask)
-      val author = getAuthor(1)
-      author shouldBe defined
+      val countBefore = authorsCount
+      val author = addAuthor(trask)
+
+      author.firstName shouldBe trask.firstName
+      authorsCount shouldEqual (countBefore + 1)
     }
 
-    "create an book" in {
-      val author = addAuthor(trask)
-//      val  book = addBook(Book(None, "", "", author.id, 2001))
+    "get one author" in {
+      val countBefore = authorsCount
+      val author = getAuthor(
+                              addAuthor(trask).id.get
+                            ).get
+
+      author.firstName shouldBe trask.firstName
+      authorsCount shouldEqual (countBefore + 1)
+    }
+
+    "return array of authors" in {
+      val countBefore = authorsCount
+      addAuthor(saumont)
+      addAuthor(fain)
+
+      getAllAuthors.size shouldEqual authorsCount
+      authorsCount shouldEqual (countBefore + 2)
+    }
+
+    "delete an author" in {
+      val countBefore = authorsCount
+
+      val author = addAuthor(saumont)
+      authorsCount shouldEqual (countBefore + 1)
+
+      deleteAuthor(author.id.get)
+      authorsCount shouldEqual countBefore
+    }
+
+    "update an author" in {
+      val _trask = addAuthor(trask)
+      val countBefore = authorsCount
+
+      val authorId = _trask.id.get
+      val _saumont = saumont.withId(authorId)
+
+      val updatedAuthor = updateAuthor(_saumont)
+      authorsCount shouldEqual countBefore
+      updatedAuthor.id.get shouldEqual _trask.id.get
+      updatedAuthor.firstName shouldEqual saumont.firstName
     }
   }
 

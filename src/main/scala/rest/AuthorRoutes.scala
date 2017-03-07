@@ -26,7 +26,7 @@ class AuthorRoutes(modules: Configuration with PersistenceModule with DbModule) 
   @Path("/{id}")
   @ApiOperation(value = "Return Author", notes = "", nickname = "", httpMethod = "GET")
   @ApiImplicitParams(Array(
-    new ApiImplicitParam(name = "id", value = "Author Id", required = false, dataType = "int", paramType = "path")
+    new ApiImplicitParam(name = "id", value = "Author Id", required = false, dataType = "long", paramType = "path")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "Return Author", response = classOf[Author]),

@@ -1,18 +1,18 @@
 package rest
 
-import persistence.entities.{Book, SimpleBook}
-
+import persistence.entities.BookRepository
+import persistence.entities.BookRepository._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.{Directives, Route}
-
 import entities.JsonProtocol
 import utils.{Configuration, DbModule, PersistenceModule}
+
 import scala.util.{Failure, Success}
 import JsonProtocol._
 import SprayJsonSupport._
-
 import javax.ws.rs.Path
+
 import io.swagger.annotations._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,7 +26,7 @@ class BookRoutes(modules: Configuration with PersistenceModule with DbModule) ex
   @Path("/{id}")
   @ApiOperation(value = "Return Book", notes = "", nickname = "", httpMethod = "GET")
   @ApiImplicitParams(Array(
-    new ApiImplicitParam(name = "id", value = "Book Id", required = false, dataType = "int", paramType = "path")
+    new ApiImplicitParam(name = "id", value = "Book Id", required = false, dataType = "long", paramType = "path")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 200, message = "Return Book", response = classOf[Book]),
@@ -38,9 +38,10 @@ class BookRoutes(modules: Configuration with PersistenceModule with DbModule) ex
     get {
       validate(bookId > 0, "The book id should be greater than zero") {
 
-        onComplete(modules.booksDal.findOne(bookId)) {
+//        onComplete(modules.booksDal.findOne(bookId)) {
+        onComplete(modules.booksDal.asInstanceOf[BookRepository].getBookWithAuthor(bookId)) {
           case Success(bookOpt) => bookOpt match {
-            case Some(book) => complete(book)
+            case Some(book) => complete(book: BookObj)
             case None => complete(NotFound, s"The book doesn't exist")
           }
           case Failure(ex) => complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
@@ -52,7 +53,7 @@ class BookRoutes(modules: Configuration with PersistenceModule with DbModule) ex
   @ApiOperation(value = "Add Book", notes = "", nickname = "", httpMethod = "POST", produces = "text/plain")
   @ApiImplicitParams(Array(
     new ApiImplicitParam (name = "body", value = "Book Object", required = true,
-      dataType = "persistence.entities.SimpleBook", paramType = "body")
+      dataType = "persistence.entities.BookRepository.SimpleBook", paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "Internal server error"),
@@ -62,7 +63,8 @@ class BookRoutes(modules: Configuration with PersistenceModule with DbModule) ex
   def bookPostRoute = path("book") {
     post {
       entity(as[SimpleBook]) { bookToInsert =>
-        onComplete(modules.booksDal.save(Book(None, bookToInsert.title, bookToInsert.desc, bookToInsert.authorId, bookToInsert.issueYear))) {
+        val book: Book = Book(None, bookToInsert.title, bookToInsert.desc, bookToInsert.authorId, bookToInsert.issueYear)
+        onComplete(modules.booksDal.save(book)) {
           case Success(_) => complete(Created)
           case Failure(ex) => complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
         }

@@ -4,6 +4,7 @@ import com.byteslounge.slickrepo.repository.Repository
 import slick.backend.DatabaseConfig
 import slick.driver.JdbcProfile
 import persistence.entities._
+import persistence.entities.BookRepository._
 import slick.dbio.DBIO
 
 import scala.concurrent.Future
@@ -25,8 +26,8 @@ trait DbModule extends Profile{
 
 trait PersistenceModule {
 	val suppliersDal: Repository[Supplier, Int]
-	val authorsDal: Repository[Author, Int]
-	val booksDal: Repository[Book, Int]
+	val authorsDal: Repository[Author, Long]
+	val booksDal: Repository[Book, Long]
 }
 
 

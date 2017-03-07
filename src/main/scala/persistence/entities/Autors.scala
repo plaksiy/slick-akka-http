@@ -8,22 +8,22 @@ import slick.driver.JdbcProfile
 case class SimpleAuthor(firstName: String, secondName: String, lastName: String)
 
 case class Author(
-          override val id : Option[Int],
+          override val id : Option[Long],
                 firstName : String,
                 secondName: String,
-                lastName  : String) extends Entity[Author, Int] {
+                lastName  : String) extends Entity[Author, Long] {
 
-  def withId(id: Int): Author = this.copy(id = Some(id))
+  def withId(id: Long): Author = this.copy(id = Some(id))
 }
 
-class AuthorRepository(override val driver: JdbcProfile) extends Repository[Author, Int](driver) {
+class AuthorRepository(override val driver: JdbcProfile) extends Repository[Author, Long](driver) {
   import driver.api._
-  val pkType = implicitly[BaseTypedType[Int]]
+  val pkType = implicitly[BaseTypedType[Long]]
   val tableQuery = TableQuery[Authors]
   type TableType = Authors
 
-  class Authors(tag: slick.lifted.Tag) extends Table[Author](tag, "AUTHORS") with Keyed[Int] {
-    def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
+  class Authors(tag: slick.lifted.Tag) extends Table[Author](tag, "AUTHORS") with Keyed[Long] {
+    def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
     def firstName = column[String]("firstName")
     def secondName = column[String]("secondName")
     def lastName = column[String]("lastName")
